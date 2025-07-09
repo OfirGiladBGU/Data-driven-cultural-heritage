@@ -1,3 +1,6 @@
+`Notice`: No option to run model as the [shapenet_part](https://shapenet.cs.stanford.edu/ericyi/shapenetcore_partanno_segmentation_benchmark_v0.zip)
+is dead.
+
 # Data-driven Restoration of Cultural Heritage Objects with Point Cloud Analysis
 Pytorch code for the paper "Data-driven Restoration of Cultural Heritage Objects with Point Cloud Analysis" by Ivan Sipiran, Alexis Mendoza, Alexander Apaza and Cristian Lopez.
 
@@ -17,7 +20,7 @@ source Refinement/bin/activate
 
 2. Install dependencies
 ~~~
-pip install torch==1.3.1 torchvision
+pip install torch torchvision
 pip install -r requirements.txt
 ~~~
 

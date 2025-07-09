@@ -5,8 +5,10 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 import sys
 sys.path.append("..")
-from losses.expansion_penalty import expansion_penalty_module as expansion
-from losses.MDS import MDS_module
+# from losses.expansion_penalty import expansion_penalty_module as expansion
+from losses.expansion_penalty import expansion_penalty_module_python as expansion
+# from losses.MDS import MDS_module
+from losses.MDS import MDS_module_python
 from losses.emd import emd_module as emd
 from losses.chamfer import champfer_loss as chamfer
 
