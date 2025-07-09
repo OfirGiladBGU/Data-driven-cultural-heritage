@@ -9,7 +9,8 @@ sys.path.append("..")
 from losses.expansion_penalty import expansion_penalty_module_python as expansion
 # from losses.MDS import MDS_module
 from losses.MDS import MDS_module_python
-from losses.emd import emd_module as emd
+# from losses.emd import emd_module as emd
+from losses.emd import emd_module_python as emd
 from losses.chamfer import champfer_loss as chamfer
 
 def index_points(points, idx):
@@ -155,7 +156,7 @@ class MSNdecoder(nn.Module):
         self.n_primitives = n_primitives
         self.decoder = nn.ModuleList([PointGenCon(bottleneck_size = 2 +self.bottleneck_size) for i in range(0,self.n_primitives)])
         self.expansion = expansion.expansionPenaltyModule()
-    
+
     def forward(self, x):
         outs = []
         
