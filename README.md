@@ -1,5 +1,5 @@
-`Notice`: No option to run model as the [shapenet_part](https://shapenet.cs.stanford.edu/ericyi/shapenetcore_partanno_segmentation_benchmark_v0.zip)
-is dead.
+`Notice`: No option to run model with [ShapeNetDataset](https://shapenet.cs.stanford.edu/ericyi/shapenetcore_partanno_segmentation_benchmark_v0.zip) -
+the link is dead.
 
 # Data-driven Restoration of Cultural Heritage Objects with Point Cloud Analysis
 Pytorch code for the paper "Data-driven Restoration of Cultural Heritage Objects with Point Cloud Analysis" by Ivan Sipiran, Alexis Mendoza, Alexander Apaza and Cristian Lopez.
@@ -75,6 +75,13 @@ Optionally, you can also save the results of the compared methods by setting the
 Download the CH dataset from [here](https://drive.google.com/file/d/1PEqrrz_FAKFEFb8GT6HNcjpGvi7JsOdq/view?usp=sharing). Locate the folder "datasetCH" inside the folder "data" of this repository.
 
 ### 2. Training
+We use Visdom to see the training progress. Therefore, before training, we need to start a visdom server with the commands:
+
+~~~
+visdom -port 8997
+visdom -port 8998
+~~~
+
 To train the model, execute:
 
 ~~~
