@@ -20,7 +20,7 @@ source Refinement/bin/activate
 
 2. Install dependencies
 ~~~
-pip install torch torchvision
+pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu102
 pip install -r requirements.txt
 ~~~
 

@@ -1,4 +1,4 @@
-from dataset.ShapeNetDataset import *
+from dataset.CHDataset import *
 from torch.utils.data import DataLoader
 import argparse
 import torch
@@ -10,14 +10,15 @@ from losses.chamfer import champfer_loss as chamfer
 from models.hole_residual import MSNautoencoder,  PointNetRes, MSNmodel, NormalModel
 from utils.utils import weights_init, visdom_show_pc, save_paths, save_model, vis_curve
 from utils.metrics import AverageValueMeter
-from losses.MDS import MDS_module
+# from losses.MDS import MDS_module
+from losses.MDS import MDS_module_python
 import visdom
 import sys
 
 #Input options
 parser = argparse.ArgumentParser()
 parser.add_argument('--batchSize', type=int, default=32, help='input batch size')
-parser.add_argument('--model', type=str, default = '',  help='optional reload model path')
+parser.add_argument('--model', type=str, default = 'MBD_CH',  help='optional reload model path')
 parser.add_argument('--workers', type=int, help='number of data loading workers', default=12)
 parser.add_argument('--nepoch', type=int, default=200, help='number of epochs to train for')
 parser.add_argument('--num_points', type=int, default = 2048,  help='number of points')

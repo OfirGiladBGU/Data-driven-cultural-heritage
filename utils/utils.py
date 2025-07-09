@@ -54,9 +54,14 @@ def save_paths(save_path, trainFile, datasetFile, modelFile):
     if not os.path.exists(dir_name):
         os.mkdir(dir_name)
     logname = os.path.join(dir_name, 'log.txt')
-    os.system('cp ./' + trainFile + '.py %s' % dir_name)
-    os.system('cp ./dataset/' + datasetFile + '.py %s' % dir_name)
-    os.system('cp ./models/' + modelFile + '.py %s' % dir_name)
+    # os.system('cp ./' + trainFile + '.py %s' % dir_name)
+    # os.system('cp ./dataset/' + datasetFile + '.py %s' % dir_name)
+    # os.system('cp ./models/' + modelFile + '.py %s' % dir_name)
+
+    import shutil
+    shutil.copy(f'./{trainFile}.py', dir_name)
+    shutil.copy(f'./dataset/{datasetFile}.py', dir_name)
+    shutil.copy(f'./models/{modelFile}.py', dir_name)
     
     return dir_name, logname
     

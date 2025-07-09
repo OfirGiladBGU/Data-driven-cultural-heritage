@@ -63,6 +63,12 @@ def save_paths(save_path, trainFile, datasetFile, modelFile):
     os.system('cp ./' + trainFile + '.py %s' % dir_name)
     os.system('cp ./dataset/' + datasetFile + '.py %s' % dir_name)
     os.system('cp ./models/' + modelFile + '.py %s' % dir_name)
+
+    import shutil
+    os.makedirs(dir_name, exist_ok=True)
+    shutil.copy(f'./{trainFile}.py', dir_name)
+    shutil.copy(f'./dataset/{datasetFile}.py', dir_name)
+    shutil.copy(f'./models/{modelFile}.py', dir_name)
     
     return dir_name, logname
     

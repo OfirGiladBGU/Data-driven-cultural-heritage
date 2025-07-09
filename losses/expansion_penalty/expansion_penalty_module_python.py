@@ -5,7 +5,7 @@ from scipy.spatial.distance import cdist
 from scipy.sparse.csgraph import minimum_spanning_tree
 
 
-class ExpansionPenaltyFunctionCPU(Function):
+class expansionPenaltyFunction(Function):
     @staticmethod
     def forward(ctx, xyz, primitive_size, alpha):
         B, N, _ = xyz.shape
@@ -66,9 +66,9 @@ class ExpansionPenaltyFunctionCPU(Function):
         return grad_xyz, None, None
 
 
-class ExpansionPenaltyModuleCPU(torch.nn.Module):
+class expansionPenaltyModule(torch.nn.Module):
     def __init__(self):
         super().__init__()
 
     def forward(self, input, primitive_size, alpha):
-        return ExpansionPenaltyFunctionCPU.apply(input, primitive_size, alpha)
+        return expansionPenaltyFunction.apply(input, primitive_size, alpha)
