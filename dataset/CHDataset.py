@@ -11,8 +11,15 @@ import sys
 from os.path import join
 from numpy import linalg as LA
 import json
-sys.path.append("./utils/")
-from pcutils import normalize, make_holes_pcd_2, make_holes_pcd_3, make_holes_base, get_rotation_x, get_rotation_z, add_rotation_to_pcloud, make_holes_horizontally, augmented_normalize
+
+try:
+    root_path = "."
+    sys.path.append(f"{root_path}/utils/")
+    from pcutils import normalize, make_holes_pcd_2, make_holes_pcd_3, make_holes_base, get_rotation_x, get_rotation_z, add_rotation_to_pcloud, make_holes_horizontally, augmented_normalize
+except:
+    root_path = ".."
+    sys.path.append(f"{root_path}/utils/")
+    from pcutils import normalize, make_holes_pcd_2, make_holes_pcd_3, make_holes_base, get_rotation_x, get_rotation_z, add_rotation_to_pcloud, make_holes_horizontally, augmented_normalize
 
 def resample_pcd(pcd, n):
     """Drop or duplicate points so that pcd has exactly n points"""
@@ -119,14 +126,21 @@ class CHDataset(data.Dataset):
     def __len__(self):
         return self.len
 
+
+def save_point_cloud(filename, pcd):
+    pc = o3d.geometry.PointCloud()
+    pc.points = o3d.utility.Vector3dVector(pcd)
+    o3d.io.write_point_cloud(filename, pc)
+
+
 if __name__ == '__main__':
 
-    dir_train = "./data/datasetCH/pottery_augmented_filtered"
-    dir_test = "./data/datasetCH/pottery_augmented_filtered_test"
+    dir_train = f"{root_path}/data/datasetCH/pottery_augmented_filtered"
+    dir_test = f"{root_path}/data/datasetCH/pottery_augmented_filtered_test"
     holes_dir = ""
 
-    complete_list_train = "./data/datasetCH/pottery_augmented_filtered_complete_train.txt"
-    complete_list_test = "./data/datasetCH/pottery_augmented_filtered_complete_test.txt"
+    complete_list_train = f"{root_path}/data/datasetCH/pottery_augmented_filtered_complete_train.txt"
+    complete_list_test = f"{root_path}/data/datasetCH/pottery_augmented_filtered_complete_test.txt"
 
     dataset = CHDataset(dir_test, holes_dir, complete_list_test, 1, npoints=2048, do_holes=False)
 
