@@ -90,7 +90,7 @@ class CHDataset(data.Dataset):
 
             # holes
             partial, hole = make_holes_base(complete, [0.05, 0.175])
-            #partial, hole = make_holes_pcd_3(complete, [0.05, 0.15])
+            # partial, hole = make_holes_pcd_3(complete, [0.05, 0.15])
 
             # translations
             # print(f'Partial shape: {partial.shape} - complete shape: {complete.shape}')
@@ -142,7 +142,7 @@ if __name__ == '__main__':
     complete_list_train = f"{root_path}/data/datasetCH/pottery_augmented_filtered_complete_train.txt"
     complete_list_test = f"{root_path}/data/datasetCH/pottery_augmented_filtered_complete_test.txt"
 
-    dataset = CHDataset(dir_test, holes_dir, complete_list_test, 1, npoints=2048, do_holes=False)
+    dataset = CHDataset(dir_test, holes_dir, complete_list_test, 1, npoints=2048, do_holes=True)
 
     #min_z = 0
     #max_z = 0
