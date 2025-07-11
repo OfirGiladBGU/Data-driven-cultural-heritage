@@ -24,6 +24,12 @@ pip3 install torch torchvision torchaudio --index-url https://download.pytorch.o
 pip install -r requirements.txt
 ~~~
 
+or:
+~~~
+pip install torch==1.8.1+cu102 torchvision==0.9.1+cu102 torchaudio==0.8.1 -f https://download.pytorch.org/whl/torch_stable.html
+pip install -r requirements.txt
+~~~
+
 ## ShapeNet Experiments
 ### 1. Download the ShapeNet dataset
 ~~~
