@@ -266,69 +266,71 @@ def cutShape(source, target, name, thr):
 
     return newMesh
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--object', type=str, default='', help='Name of the OBJ file with object to repair')
-parser.add_argument('--inputFolder', type=str, default='', help='Folder with the objects to repair')
-parser.add_argument('--model', type=str, default='', help='Name of the neural network')
-parser.add_argument('--outputFolder', type=str, default='', help='Folder with the results')
-parser.add_argument('--save', action='store_true', help='optional flag to save the result')
-parser.add_argument('--ratio', type=float, default=0.1, help='The threshold to remove the geometry')
-#parser.add_argument('--nameOutput', type=str, default='', help='')
-opt = parser.parse_args()
 
-#Set the CUDA device if available
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-if torch.cuda.is_available():
-    print("Using cuda device")
-    torch.cuda.set_device(device)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--object', type=str, default='', help='Name of the OBJ file with object to repair')
+    parser.add_argument('--inputFolder', type=str, default='', help='Folder with the objects to repair')
+    parser.add_argument('--model', type=str, default='', help='Name of the neural network')
+    parser.add_argument('--outputFolder', type=str, default='', help='Folder with the results')
+    parser.add_argument('--save', action='store_true', help='optional flag to save the result')
+    parser.add_argument('--ratio', type=float, default=0.1, help='The threshold to remove the geometry')
+    #parser.add_argument('--nameOutput', type=str, default='', help='')
+    opt = parser.parse_args()
 
-#Load the neural network
-network = MSNmodel(2048, device).to(device)
-network.apply(weights_init)
-network.cuda()
+    #Set the CUDA device if available
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    if torch.cuda.is_available():
+        print("Using cuda device")
+        torch.cuda.set_device(device)
 
-print(opt.model, os.path.isfile(opt.model + "/model.pth"))
+    #Load the neural network
+    network = MSNmodel(2048, device).to(device)
+    network.apply(weights_init)
+    network.cuda()
 
-if opt.model != '' and os.path.isfile(opt.model + "/model.pth"):
-    model_checkpoint = torch.load(opt.model + "/model.pth",map_location='cuda:0')
-    residual_checkpoint = torch.load(opt.model + "/residual.pth",map_location='cuda:0')
-    
-    print("Model network weights loaded ")
-    network.model.load_state_dict(model_checkpoint['state_dict'])
+    print(opt.model, os.path.isfile(opt.model + "/model.pth"))
 
-    
-    #print("Residual network weights loaded ")
-    network.residual.load_state_dict(residual_checkpoint['state_dict'])
+    if opt.model != '' and os.path.isfile(opt.model + "/model.pth"):
+        model_checkpoint = torch.load(opt.model + "/model.pth",map_location='cuda:0')
+        residual_checkpoint = torch.load(opt.model + "/residual.pth",map_location='cuda:0')
 
-network.model.eval()
-network.residual.eval()
+        print("Model network weights loaded ")
+        network.model.load_state_dict(model_checkpoint['state_dict'])
 
-#Process the object with the neural network
-pcdPartial, pcdHole = processShape(network, opt)
 
-filenamePred = os.path.join(opt.outputFolder, opt.object + '_pred.xyz')
-filenameOff = os.path.join(opt.outputFolder, opt.object + '.off')
+        #print("Residual network weights loaded ")
+        network.residual.load_state_dict(residual_checkpoint['state_dict'])
 
-pcdHole2 = consolidatePointCloud2(pcdPartial, pcdHole)
-consolidatePointCloud(pcdPartial, pcdHole2, filenamePred)
+    network.model.eval()
+    network.residual.eval()
 
-command = 'meshlabserver -i ' + filenamePred + ' -o ' + filenameOff + '.off -s ./scripts/reconstruction.mlx'
-os.system(command)
+    #Process the object with the neural network
+    pcdPartial, pcdHole = processShape(network, opt)
 
-filenameOriginal = os.path.join(opt.inputFolder, opt.object + '.obj')
-filenameProc = os.path.join(opt.outputFolder, opt.object + '.off.off')
+    filenamePred = os.path.join(opt.outputFolder, opt.object + '_pred.xyz')
+    filenameOff = os.path.join(opt.outputFolder, opt.object + '.off')
 
-#We read both meshes: the original and the reconstruction    
-mesh1 = o3d.io.read_triangle_mesh(filenameOriginal)
-mesh2 = o3d.io.read_triangle_mesh(filenameProc)
+    pcdHole2 = consolidatePointCloud2(pcdPartial, pcdHole)
+    consolidatePointCloud(pcdPartial, pcdHole2, filenamePred)
 
-#We cut the reconstructed shape only to cover the base
-meshResult = cutShape(mesh2, mesh1, opt.object, opt.ratio)
+    command = 'meshlabserver -i ' + filenamePred + ' -o ' + filenameOff + '.off -s ./scripts/reconstruction.mlx'
+    os.system(command)
 
-#Optionally, we save the result
-if opt.save:
-    filenameSave = os.path.join(opt.outputFolder, opt.object + '.off')
-    o3d.io.write_triangle_mesh(filenameSave, meshResult)
-    filenameSaveOrig = os.path.join(opt.outputFolder, opt.object + '_original.off')
-    o3d.io.write_triangle_mesh(filenameSaveOrig, mesh1)
+    filenameOriginal = os.path.join(opt.inputFolder, opt.object + '.obj')
+    filenameProc = os.path.join(opt.outputFolder, opt.object + '.off.off')
+
+    #We read both meshes: the original and the reconstruction
+    mesh1 = o3d.io.read_triangle_mesh(filenameOriginal)
+    mesh2 = o3d.io.read_triangle_mesh(filenameProc)
+
+    #We cut the reconstructed shape only to cover the base
+    meshResult = cutShape(mesh2, mesh1, opt.object, opt.ratio)
+
+    #Optionally, we save the result
+    if opt.save:
+        filenameSave = os.path.join(opt.outputFolder, opt.object + '.off')
+        o3d.io.write_triangle_mesh(filenameSave, meshResult)
+        filenameSaveOrig = os.path.join(opt.outputFolder, opt.object + '_original.off')
+        o3d.io.write_triangle_mesh(filenameSaveOrig, mesh1)
 

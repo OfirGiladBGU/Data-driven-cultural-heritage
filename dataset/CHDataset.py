@@ -11,15 +11,11 @@ import sys
 from os.path import join
 from numpy import linalg as LA
 import json
+import pathlib
 
-try:
-    root_path = "."
-    sys.path.append(f"{root_path}/utils/")
-    from pcutils import normalize, make_holes_pcd_2, make_holes_pcd_3, make_holes_base, get_rotation_x, get_rotation_z, add_rotation_to_pcloud, make_holes_horizontally, augmented_normalize
-except:
-    root_path = ".."
-    sys.path.append(f"{root_path}/utils/")
-    from pcutils import normalize, make_holes_pcd_2, make_holes_pcd_3, make_holes_base, get_rotation_x, get_rotation_z, add_rotation_to_pcloud, make_holes_horizontally, augmented_normalize
+root_path = str(pathlib.Path(__file__).parent.parent)
+sys.path.append(f"{root_path}/utils/")
+from pcutils import normalize, make_holes_pcd_2, make_holes_pcd_3, make_holes_base, get_rotation_x, get_rotation_z, add_rotation_to_pcloud, make_holes_horizontally, augmented_normalize
 
 def resample_pcd(pcd, n):
     """Drop or duplicate points so that pcd has exactly n points"""
