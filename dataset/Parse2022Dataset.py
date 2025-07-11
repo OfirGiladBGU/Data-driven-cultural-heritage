@@ -66,7 +66,7 @@ class Parse2022Dataset(data.Dataset):
         self.npoints = npoints
         self.n_partial_models = n_partial_models
 
-        self.len = len(self.dir_labels) * n_partial_models
+        self.len = len(self.labels) * n_partial_models
 
         self.do_holes = do_holes
         self.function = function
