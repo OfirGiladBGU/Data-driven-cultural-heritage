@@ -6,6 +6,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.autograd import Variable
 from losses.emd import emd_module as emd
+# from losses.emd import emd_module_python as emd
 from losses.chamfer import champfer_loss as chamfer
 from models.hole_residual import MSNautoencoder,  PointNetRes, MSNmodel, NormalModel
 from utils.utils import weights_init, visdom_show_pc, save_paths, save_model, vis_curve
@@ -73,6 +74,8 @@ if __name__ == '__main__':
     dataset_test = Parse2022Dataset(dir_labels, dir_preds_fixed, dir_holes, n_models, npoints=opt.num_points, train=False)
     dataloader_test = DataLoader(dataset_test, batch_size=opt.batchSize, shuffle=True, num_workers=int(opt.workers))
 
+    print("Dataset train size: ", len(dataloader_train))
+    print("Dataset test size: ", len(dataloader_test))
     device = torch.device("cuda:" + str(opt.gpu_n) if torch.cuda.is_available() else "cpu")
     if torch.cuda.is_available():
         print("Using cuda device")
