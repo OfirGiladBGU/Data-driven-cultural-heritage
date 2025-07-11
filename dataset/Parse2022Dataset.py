@@ -37,10 +37,12 @@ def rotate_pcd_shapeNet(pcd, posA=1, posB=2):
 
 
 class Parse2022Dataset(data.Dataset):
-    def __init__(self, dir_labels, dir_preds_fixed, dir_holes, n_partial_models, npoints=2048, do_holes=False, function=None):
+    def __init__(self, dir_labels, dir_preds_fixed, dir_holes, n_partial_models, npoints=2048, do_holes=False, function=None,
+                 train = True):
         self.dir_labels = dir_labels
         self.dir_preds_fixed = dir_preds_fixed
         self.dir_holes = dir_holes
+        self.train = train
 
         def convert_to_str_list(path_list):
             return [str(path).replace('\\', '/') for path in path_list]
@@ -48,6 +50,18 @@ class Parse2022Dataset(data.Dataset):
         self.labels = convert_to_str_list(sorted(pathlib.Path(dir_labels).glob("*.pcd")))
         self.preds_fixed = convert_to_str_list(sorted(pathlib.Path(dir_preds_fixed).glob("*.pcd")))
         self.holes = convert_to_str_list(sorted(pathlib.Path(dir_holes).glob("*.pcd")))
+
+        split_value = 0.9
+        def split_data(data_list):
+            if self.train:
+                data_list = data_list[:int(split_value * len(data_list))]
+            else:
+                data_list = data_list[int(split_value * len(data_list)):]
+            return data_list
+
+        self.labels = split_data(self.labels)
+        self.preds_fixed = split_data(self.preds_fixed)
+        self.holes = split_data(self.holes)
 
         self.npoints = npoints
         self.n_partial_models = n_partial_models
