@@ -23,7 +23,7 @@ if __name__ == '__main__':
     #Input options
     parser = argparse.ArgumentParser()
     parser.add_argument('--batchSize', type=int, default=32, help='input batch size')
-    parser.add_argument('--model', type=str, default = 'MBD_CH',  help='optional reload model path')
+    parser.add_argument('--model', type=str, default = 'MBD_Parse2022',  help='optional reload model path')
     parser.add_argument('--workers', type=int, help='number of data loading workers', default=1)
     parser.add_argument('--nepoch', type=int, default=200, help='number of epochs to train for')
     parser.add_argument('--num_points', type=int, default = 2048,  help='number of points')
