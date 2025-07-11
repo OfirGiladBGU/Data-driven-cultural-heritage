@@ -41,6 +41,7 @@ if __name__ == '__main__':
 
 
     opt = parser.parse_args()
+    opt.nepoch = 100
 
     #We use Visdom to see the training progress
     vis = visdom.Visdom(port = opt.vis_port, env= opt.vis_env + " TRAIN")
