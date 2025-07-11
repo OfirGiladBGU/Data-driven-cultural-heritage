@@ -1,6 +1,4 @@
 import torch
-import numpy as np
-from torch import nn
 from torch.autograd import Function
 
 
@@ -13,21 +11,26 @@ def minimum_density_sampling(xyz, npoint, mean_mst_length):
     Returns:
         idx: (B, npoint) int64
     """
-    B, N, _ = xyz.shape
-    idx = torch.zeros(B, npoint, dtype=torch.long, device=xyz.device)
+    batchsize, n, _ = xyz.shape
+    idx = torch.zeros(batchsize, npoint, dtype=torch.long, device=xyz.device)
 
-    for b in range(B):
-        cur_xyz = xyz[b]  # [N, 3]
+    for b in range(batchsize):
+        cur_xyz = xyz[b]  # [n, 3]
         selected = []
-        distances = torch.ones(N, device=xyz.device) * 1e10
+        distances = torch.ones(n, device=xyz.device) * 1e10
+        threshold = mean_mst_length[b].item() * 0.5  # Example usage
 
         # randomly select the first point
-        farthest = torch.randint(0, N, (1,), device=xyz.device).item()
+        farthest = torch.randint(0, n, (1,), device=xyz.device).item()
         for i in range(npoint):
             selected.append(farthest)
             idx[b, i] = farthest
             centroid = cur_xyz[farthest].unsqueeze(0)  # [1, 3]
             dist = torch.norm(cur_xyz - centroid, dim=1)
+
+            # apply mean_mst_length threshold to prevent selecting points too close
+            dist[dist < threshold] = 1e10
+
             distances = torch.minimum(distances, dist)
             farthest = torch.argmax(distances).item()
 
@@ -56,20 +59,20 @@ class GatherOperationFunction(Function):
         idx: [B, npoint]
         returns: [B, C, npoint]
         """
-        B, C, N = features.shape
-        _, S = idx.shape
+        batchsize, channels, n = features.shape
+        _, npoint = idx.shape
 
-        idx_expanded = idx.unsqueeze(1).expand(-1, C, -1)  # [B, C, npoint]
+        idx_expanded = idx.unsqueeze(1).expand(-1, channels, -1)  # [B, C, npoint]
         output = torch.gather(features, 2, idx_expanded)
-        ctx.save_for_backward(idx, torch.tensor(N))
+        ctx.save_for_backward(idx, torch.tensor(n))
         return output
 
     @staticmethod
     def backward(ctx, grad_out):
-        idx, N = ctx.saved_tensors
-        B, C, S = grad_out.shape
-        grad_features = torch.zeros(B, C, N.item(), device=grad_out.device)
-        idx_expanded = idx.unsqueeze(1).expand(-1, C, -1)
+        idx, n = ctx.saved_tensors
+        batchsize, channels, npoint = grad_out.shape
+        grad_features = torch.zeros(batchsize, channels, n.item(), device=grad_out.device)
+        idx_expanded = idx.unsqueeze(1).expand(-1, channels, -1)
         grad_features.scatter_add_(2, idx_expanded, grad_out)
         return grad_features, None
 
