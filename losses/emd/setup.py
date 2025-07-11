@@ -2,9 +2,9 @@ from setuptools import setup
 from torch.utils.cpp_extension import BuildExtension, CUDAExtension
 
 setup(
-    name='emd',
+    name='emd_ext',
     ext_modules=[
-        CUDAExtension('emd', [
+        CUDAExtension('emd_ext', [
             'emd.cpp',
             'emd_cuda.cu',
         ]),
