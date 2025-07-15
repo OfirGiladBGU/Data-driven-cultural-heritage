@@ -65,9 +65,16 @@ if __name__ == '__main__':
     n_models = 1
 
     # Parse2022 part dataloader
-    dir_labels = f"./data/parse2022/labels"
-    dir_preds_fixed = f"./data/parse2022/preds_fixed"
-    dir_holes = f"./data/parse2022/holes"
+
+    # V1
+    # dir_labels = f"./data/parse2022/labels"
+    # dir_preds_fixed = f"./data/parse2022/preds_fixed"
+    # dir_holes = f"./data/parse2022/holes"
+
+    # V2
+    dir_labels = f"./../TreesAutoEncoder/data_crops/parse2022_LC_64_50/labels_3d"
+    dir_preds_fixed = f"./../TreesAutoEncoder/data_crops/parse2022_LC_64_50/preds_fixed_3d"
+    dir_holes = f"./../TreesAutoEncoder/data_crops/parse2022_LC_64_50/holes_3d"
 
     dataset_train = Parse2022Dataset(dir_labels, dir_preds_fixed, dir_holes, n_models, npoints=opt.num_points, train=True)
     dataloader_train = DataLoader(dataset_train, batch_size=opt.batchSize, shuffle=True, num_workers=int(opt.workers))

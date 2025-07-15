@@ -51,13 +51,27 @@ class Parse2022Dataset(data.Dataset):
         self.preds_fixed = convert_to_str_list(sorted(pathlib.Path(dir_preds_fixed).glob("*.pcd")))
         self.holes = convert_to_str_list(sorted(pathlib.Path(dir_holes).glob("*.pcd")))
 
+        index_3d_uniques = list(set([pathlib.Path(label).stem.split("_")[0] for label in self.labels]))
+
         split_value = 0.9
+        index_3d_train = index_3d_uniques[:int(split_value * len(index_3d_uniques))]
+        index_3d_test = index_3d_uniques[int(split_value * len(index_3d_uniques)):]
+        
+        # print(f"Train: {sorted(index_3d_train)} - Test: {sorted(index_3d_test)}")
+
         def split_data(data_list):
             if self.train:
-                data_list = data_list[:int(split_value * len(data_list))]
+                data_list = [data for data in data_list if pathlib.Path(data).stem.split("_")[0] in index_3d_train]
             else:
-                data_list = data_list[int(split_value * len(data_list)):]
+                data_list = [data for data in data_list if pathlib.Path(data).stem.split("_")[0] in index_3d_test]
             return data_list
+        
+        # def split_data(data_list):
+        #     if self.train:
+        #         data_list = data_list[:int(split_value * len(data_list))]
+        #     else:
+        #         data_list = data_list[int(split_value * len(data_list)):]
+        #     return data_list
 
         self.labels = split_data(self.labels)
         self.preds_fixed = split_data(self.preds_fixed)
@@ -192,10 +206,17 @@ def convert_nifti_to_pcd(dir_labels, dir_preds_fixed, dir_holes):
 
 
 if __name__ == '__main__':
-    dir_labels = f"{root_path}/data/parse2022/labels"
-    dir_preds_fixed = f"{root_path}/data/parse2022/preds_fixed"
+    # V1
+    # dir_labels = f"{root_path}/data/parse2022/labels"
+    # dir_preds_fixed = f"{root_path}/data/parse2022/preds_fixed"
+    # # Created by the script
+    # dir_holes = f"{root_path}/data/parse2022/holes"
+
+    # V2
+    dir_labels = f"{root_path}/../TreesAutoEncoder/data_crops/parse2022_LC_64_50/labels_3d"
+    dir_preds_fixed = f"{root_path}/../TreesAutoEncoder/data_crops/parse2022_LC_64_50/preds_fixed_3d"
     # Created by the script
-    dir_holes = f"{root_path}/data/parse2022/holes"
+    dir_holes = f"{root_path}/../TreesAutoEncoder/data_crops/parse2022_LC_64_50/holes_3d"
 
 
     # Preprocess NIfTI files to PCD
