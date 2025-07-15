@@ -366,6 +366,21 @@ if __name__ == "__main__":
     network.residual.eval()
 
     pcd_filepaths = list(pathlib.Path(opt.inputFolder).glob('*.pcd'))
+
+    # Filter test files
+    index_3d_uniques = list(set([pathlib.Path(pcd).stem.split("_")[0] for pcd in pcd_filepaths]))
+
+    split_value = 0.9
+    index_3d_test = index_3d_uniques[int(split_value * len(index_3d_uniques)):]
+
+    def split_data(data_list):
+        data_list = [data for data in data_list if pathlib.Path(data).stem.split("_")[0] in index_3d_test]
+        return data_list
+    pcd_filepaths = split_data(pcd_filepaths)
+
+    ###########
+    # Predict #
+    ###########
     for i, filepath in enumerate(pcd_filepaths):
         opt.object = filepath.stem
         print(f"Processing file: {filepath} [{i+1} / {len(pcd_filepaths)}]")
