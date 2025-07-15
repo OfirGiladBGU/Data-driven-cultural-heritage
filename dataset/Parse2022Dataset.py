@@ -51,7 +51,7 @@ class Parse2022Dataset(data.Dataset):
         self.preds_fixed = convert_to_str_list(sorted(pathlib.Path(dir_preds_fixed).glob("*.pcd")))
         self.holes = convert_to_str_list(sorted(pathlib.Path(dir_holes).glob("*.pcd")))
 
-        index_3d_uniques = list(set([pathlib.Path(label).stem.split("_")[0] for label in self.labels]))
+        index_3d_uniques = sorted(set([pathlib.Path(label).stem.split("_")[0] for label in self.labels]))
 
         split_value = 0.9
         index_3d_train = index_3d_uniques[:int(split_value * len(index_3d_uniques))]
