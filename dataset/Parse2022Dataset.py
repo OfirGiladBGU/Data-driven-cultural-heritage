@@ -13,7 +13,7 @@ from numpy import linalg as LA
 import json
 import pathlib
 
-root_path = str(pathlib.Path(__file__).parent.parent)
+root_path = str(pathlib.Path(__file__).absolute().parent.parent)
 sys.path.append(f"{root_path}/utils/")
 from pcutils import normalize, make_holes_pcd_2, make_holes_pcd_3, make_holes_base, get_rotation_x, get_rotation_z, \
     add_rotation_to_pcloud, make_holes_horizontally, augmented_normalize
@@ -167,6 +167,8 @@ def convert_nifti_to_pcd(dir_labels, dir_preds_fixed, dir_holes):
         # Convert to float32 for Open3D compatibility
         coords = coords.astype(np.float64)
         # Save to PCD file
+        if coords.size == 0:
+            coords = np.zeros((1, 3), dtype=np.float64)  # Ensure at least one point
         save_path = str(data_path).replace(pattern, '.pcd')
         save_point_cloud(save_path, coords)
 
@@ -183,8 +185,8 @@ def convert_nifti_to_pcd(dir_labels, dir_preds_fixed, dir_holes):
         hole_path = pathlib.Path(dir_holes).joinpath(pathlib.Path(label_path).name)
 
         # Save as PCD
-        # save_numpy_as_pcd(label_data, label_path)
-        # save_numpy_as_pcd(pred_fixed_data, pred_fixed_path)
+        save_numpy_as_pcd(label_data, label_path)
+        save_numpy_as_pcd(pred_fixed_data, pred_fixed_path)
         save_numpy_as_pcd(hole_data, hole_path)
 
 
