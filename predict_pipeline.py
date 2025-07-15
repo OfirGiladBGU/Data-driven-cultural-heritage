@@ -368,7 +368,7 @@ if __name__ == "__main__":
     pcd_filepaths = list(pathlib.Path(opt.inputFolder).glob('*.pcd'))
 
     # Filter test files
-    index_3d_uniques = list(set([pathlib.Path(pcd).stem.split("_")[0] for pcd in pcd_filepaths]))
+    index_3d_uniques = sorted(set([pathlib.Path(pcd).stem.split("_")[0] for pcd in pcd_filepaths]))
 
     split_value = 0.9
     index_3d_test = index_3d_uniques[int(split_value * len(index_3d_uniques)):]
