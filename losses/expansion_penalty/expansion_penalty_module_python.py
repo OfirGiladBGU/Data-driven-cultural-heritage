@@ -39,7 +39,7 @@ class expansionPenaltyFunction(Function):
                         father[b, start + i] = start + j
 
         mean_mst_length /= num_elements
-        ctx.save_for_backward(xyz, torch.tensor(father, device=xyz.device))
+        ctx.save_for_backward(xyz, torch.from_numpy(father).to(device=xyz.device, dtype=torch.long))
 
         return (
             torch.tensor(dist, device=xyz.device),
@@ -56,6 +56,13 @@ class expansionPenaltyFunction(Function):
         for b in range(batchsize):
             for i in range(n):
                 j = father[b, i].item()
+
+                # 🛡️ Safe indexing
+                if 0 <= j < xyz.shape[1]:
+                    delta = xyz[b, i] - xyz[b, j]
+                    norm = torch.norm(delta) + 1e-6
+                    grad_xyz[b, i] += grad_dist[b, i] * delta / norm
+
                 if j >= 0:
                     delta = xyz[b, i] - xyz[b, j]
                     norm = torch.norm(delta) + 1e-6

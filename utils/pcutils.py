@@ -24,7 +24,10 @@ def normalize(points, unit_ball = False):
     if unit_ball:
         normalized_points = normalized_points/(max_distance)
     else:
-        normalized_points = normalized_points/(2 * max_distance)
+        scale = 2 * max_distance
+        if scale < 1e-8:
+            scale = 1.0  # fallback to prevent NaNs
+        normalized_points = normalized_points / scale
 
     return normalized_points
 
@@ -39,7 +42,9 @@ def normalize2(points, unit_ball = False):
         normalized_points = normalized_points/(max_distance)
     else:
         scale = 2 * max_distance
-        normalized_points = normalized_points/(2 * max_distance)
+        if scale < 1e-8:
+            scale = 1.0  # fallback to prevent NaNs
+        normalized_points = normalized_points / scale
 
     return normalized_points, scale
     #return normalized_points
