@@ -365,7 +365,7 @@ if __name__ == "__main__":
     network.model.eval()
     network.residual.eval()
 
-    pcd_filepaths = list(pathlib.Path(opt.inputFolder).glob('*.pcd'))
+    pcd_filepaths = sorted(pathlib.Path(opt.inputFolder).glob('*.pcd'))
 
     # Filter test files
     index_3d_uniques = sorted(set([pathlib.Path(pcd).stem.split("_")[0] for pcd in pcd_filepaths]))
