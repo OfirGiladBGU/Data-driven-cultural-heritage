@@ -388,7 +388,8 @@ if __name__ == "__main__":
         # Process the point cloud file
         pcdPartial, pcdHole = processPCD(network, opt)
 
-        filenamePred = os.path.join(opt.outputFolder, opt.object + '_pred.pcd')
+        # filenamePred = os.path.join(opt.outputFolder, opt.object + '_pred.pcd')
+        filenamePred = os.path.join(opt.outputFolder, opt.object + '_output.pcd')
 
         pcdHole2 = consolidatePointCloud2(pcdPartial, pcdHole)
         consolidatePointCloud(pcdPartial, pcdHole2, filenamePred)
