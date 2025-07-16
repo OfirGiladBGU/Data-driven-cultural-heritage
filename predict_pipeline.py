@@ -104,6 +104,9 @@ def consolidatePointCloud2(pcdPartial, pcdHole):
             new_points.append(pcdHole[i])
 
     print(len(new_points))
+    if len(new_points) == 0:
+        print("Warning: No points left after cropping. 1 point at the center.")
+        new_points = [[0.0, 0.0, 0.0]]
     pointsHole = np.vstack(new_points)
     
     return pointsHole
@@ -279,17 +282,19 @@ def cutShape(source, target, name, thr):
 def processPCD(network, opt):
     filename = os.path.join(opt.inputFolder, opt.object + '.pcd')
 
+    # Read original input point cloud and compute bounding box
     pcd = read_points(filename=filename)
+    min_bound = np.min(pcd, axis=0)
+    max_bound = np.max(pcd, axis=0)
 
     listPartial = []
     listHole = []
 
-    temp_pcd = o3d.geometry.PointCloud()
-
     #The neural network is executed eight times to compute a good resoution
     for i in range(0,8):
-        #Sample point in the surface
+        #Sample points from the point cloud
         sampled_pcd = resample_pcd(pcd, 2048)
+        temp_pcd = o3d.geometry.PointCloud()
         temp_pcd.points = o3d.utility.Vector3dVector(sampled_pcd)
         #Run the neural network which produces the prediction, the partial input and the missing geometry
         pred, partial, hole, scal = predict(network, temp_pcd)
@@ -304,6 +309,27 @@ def processPCD(network, opt):
     #Scale back the objects
     partial = partial*scal
     hole = hole*scal
+
+    # print("scal: ", scal)
+
+    # min_bound_test = np.min(partial, axis=0)
+    # max_bound_test = np.max(partial, axis=0)
+    # print("partial Min bound: ", min_bound_test, " Max bound: ", max_bound_test)
+
+    # min_bound_test = np.min(hole, axis=0)
+    # max_bound_test = np.max(hole, axis=0)
+    # print("hole Min bound: ", min_bound_test, " Max bound: ", max_bound_test)
+
+    # Smart cropping to match input bounding box
+    def crop_to_bounds(points, min_b, max_b):
+        mask = np.all((points >= min_b) & (points <= max_b), axis=1)
+        masked_points = points[mask]
+        if masked_points.shape[0] == 0:
+            masked_points = np.array([[0.0, 0.0, 0.0]])  # Fallback if no points remain
+        return masked_points
+
+    partial = crop_to_bounds(partial, min_bound, max_bound)
+    hole = crop_to_bounds(hole, min_bound, max_bound)
 
     partial = partial.astype(np.float32)
     hole = hole.astype(np.float32)
