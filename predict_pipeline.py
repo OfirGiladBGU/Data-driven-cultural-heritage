@@ -320,16 +320,31 @@ def processPCD(network, opt):
     # max_bound_test = np.max(hole, axis=0)
     # print("hole Min bound: ", min_bound_test, " Max bound: ", max_bound_test)
 
-    # Smart cropping to match input bounding box
-    def crop_to_bounds(points, min_b, max_b):
-        mask = np.all((points >= min_b) & (points <= max_b), axis=1)
-        masked_points = points[mask]
-        if masked_points.shape[0] == 0:
-            masked_points = np.array([[0.0, 0.0, 0.0]])  # Fallback if no points remain
-        return masked_points
+    # V1
 
-    partial = crop_to_bounds(partial, min_bound, max_bound)
-    hole = crop_to_bounds(hole, min_bound, max_bound)
+    # # Smart cropping to match input bounding box
+    # def crop_to_bounds(points, min_b, max_b):
+    #     mask = np.all((points >= min_b) & (points <= max_b), axis=1)
+    #     masked_points = points[mask]
+    #     if masked_points.shape[0] == 0:
+    #         masked_points = np.array([[0.0, 0.0, 0.0]])  # Fallback if no points remain
+    #     return masked_points
+
+    # partial = crop_to_bounds(partial, min_bound, max_bound)
+    # hole = crop_to_bounds(hole, min_bound, max_bound)
+
+    # V2
+
+    def scale_to_range(points, target_min, target_max):
+        curr_min = np.min(points, axis=0)
+        curr_max = np.max(points, axis=0)
+        scale = (target_max - target_min) / (curr_max - curr_min + 1e-8)  # avoid zero division
+        return (points - curr_min) * scale + target_min
+    
+    partial = scale_to_range(partial, min_bound, max_bound)
+    hole = scale_to_range(hole, min_bound, max_bound)
+
+    # Continue
 
     partial = partial.astype(np.float32)
     hole = hole.astype(np.float32)
@@ -360,8 +375,8 @@ if __name__ == "__main__":
 
     opt.model = "./log/MBD_Parse2022"
 
-    opt.inputFolder = f"./../TreesAutoEncoder/data_crops/parse2022_LC_64_50/preds_fixed_3d"
-    opt.outputFolder = f"./../TreesAutoEncoder/data_results/parse2022_LC_64_50/predict_pipeline/output_3d"
+    opt.inputFolder = f"./../TreesAutoEncoder/data_crops/parse2022_LC_32_50/preds_fixed_3d_pcd"
+    opt.outputFolder = f"./../TreesAutoEncoder/data_results/parse2022_LC_32_50/predict_pipeline/output_3d"
     os.makedirs(opt.outputFolder, exist_ok=True)
 
     #Set the CUDA device if available
