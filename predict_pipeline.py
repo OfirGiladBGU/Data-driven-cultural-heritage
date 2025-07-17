@@ -83,11 +83,26 @@ def save_point_cloud(filename, pcd):
     pc.points = o3d.utility.Vector3dVector(pcd)
     o3d.io.write_point_cloud(filename, pc)
 
-def consolidatePointCloud(pcdPartial, pcdHole, name):
+def consolidatePointCloud(opt, pcdPartial, pcdHole, name):
+    # filename = os.path.join(opt.inputFolder, opt.object + '.pcd')
+
+    # # Read original input point cloud and compute bounding box
+    # pcd = read_points(filename=filename)
+    # min_bound = np.min(pcd, axis=0)
+    # max_bound = np.max(pcd, axis=0)
+
     #Smooth the combination of point clouds
     flags = np.concatenate((np.ones((pcdPartial.shape[0],1), dtype='int32'), 2*np.ones((pcdHole.shape[0],1), dtype='int32')))
     points = np.concatenate((pcdPartial, pcdHole))
     points = guided_filter(points, flags, 0.1, 0.01)
+
+    # def scale_to_range(points, target_min, target_max):
+    #     curr_min = np.min(points, axis=0)
+    #     curr_max = np.max(points, axis=0)
+    #     scale = (target_max - target_min) / (curr_max - curr_min + 1e-8)  # avoid zero division
+    #     return (points - curr_min) * scale + target_min
+    
+    # points = scale_to_range(points, min_bound, max_bound)
 
     save_point_cloud(name, points)
 
@@ -438,5 +453,5 @@ if __name__ == "__main__":
         filenamePred = os.path.join(opt.outputFolder, opt.object + '_output.pcd')
 
         pcdHole2 = consolidatePointCloud2(pcdPartial, pcdHole)
-        consolidatePointCloud(pcdPartial, pcdHole2, filenamePred)
+        consolidatePointCloud(opt, pcdPartial, pcdHole2, filenamePred)
         
