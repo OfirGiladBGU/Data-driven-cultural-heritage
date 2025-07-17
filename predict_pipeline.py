@@ -335,13 +335,18 @@ def processPCD(network, opt):
 
     # V2
 
-    def scale_to_range(points, target_min, target_max):
-        curr_min = np.min(points, axis=0)
-        curr_max = np.max(points, axis=0)
+    def scale_to_range(points, target_min, target_max, partial=None):
+        if partial is None:
+            curr_min = np.min(points, axis=0)
+            curr_max = np.max(points, axis=0)
+        else:
+            curr_min = np.min(partial, axis=0)
+            curr_max = np.max(partial, axis=0)
         scale = (target_max - target_min) / (curr_max - curr_min + 1e-8)  # avoid zero division
         return (points - curr_min) * scale + target_min
     
     partial = scale_to_range(partial, min_bound, max_bound)
+    # hole = scale_to_range(hole, min_bound, max_bound, partial=partial)
     hole = scale_to_range(hole, min_bound, max_bound)
 
     # Continue
